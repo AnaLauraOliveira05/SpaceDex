@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="SpaceDex - Enciclopédia digital de objetos do universo. Explore, descubra e catalogue planetas, galáxias, estrelas e nebulosas.">
+  <title>SpaceDex - Enciclopédia Digital do Universo</title>
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌌</text></svg>">
+</head>
+<body>
+  <!-- Canvas de Estrelas Cintilantes -->
+  <canvas id="starfield"></canvas>
+
+  <!-- Cabeçalho Principal -->
+  <header class="site-header">
+    <div class="container nav-container">
+      <div class="logo" id="brand-logo" onclick="app.navigateTo('inicio')">
+        <div class="logo-icon">🪐</div>
+        <span>SpaceDex</span>
+      </div>
+
+      <button class="menu-toggle" id="menu-toggle" aria-label="Abrir Menu">
+        ☰
+      </button>
+
+      <nav>
+        <ul class="nav-menu" id="nav-menu">
+          <li><a href="#inicio" class="nav-link active" data-target="inicio">Início</a></li>
+          <li><a href="#explorar" class="nav-link" data-target="explorar">Explorar</a></li>
+          <li><a href="#cadastrar" class="nav-link" data-target="cadastrar">Cadastrar Astro</a></li>
+          <li>
+            <a href="#favoritos" class="nav-link" data-target="favoritos">
+              Favoritos <span class="fav-badge" id="nav-fav-count">0</span>
+            </a>
+          </li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Conteúdo Principal -->
+  <main>
+    <!-- SEÇÃO: INÍCIO / DASHBOARD -->
+    <section id="inicio" class="hero-section">
+      <div class="container">
+        <div class="hero-tag">Enciclopédia Cósmica Interativa</div>
+        <h1 class="hero-title">SpaceDex</h1>
+        <p class="hero-subtitle">Explore, descubra e catalogue o universo em uma enciclopédia estelar viva e interativa.</p>
+        
+        <div class="hero-actions">
+          <a href="#explorar" class="btn btn-primary" onclick="app.navigateTo('explorar')">
+            <span>🔭</span> Explorar o Universo
+          </a>
+          <a href="#cadastrar" class="btn btn-secondary" onclick="app.navigateTo('cadastrar')">
+            <span>➕</span> Cadastrar Novo Astro
+          </a>
+        </div>
+
+        <!-- Painel de Estatísticas Dinâmicas -->
+        <div class="stats-grid" id="stats-container">
+          <div class="stat-card">
+            <div class="stat-icon">🌌</div>
+            <div class="stat-value" id="stat-total">0</div>
+            <div class="stat-label">Total de Astros</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🪐</div>
+            <div class="stat-value" id="stat-planetas">0</div>
+            <div class="stat-label">Planetas</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">☀️</div>
+            <div class="stat-value" id="stat-estrelas">0</div>
+            <div class="stat-label">Estrelas</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">🌀</div>
+            <div class="stat-value" id="stat-galaxias">0</div>
+            <div class="stat-label">Galáxias</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-icon">⭐</div>
+            <div class="stat-value" id="stat-favoritos">0</div>
+            <div class="stat-label">Favoritos</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO: EXPLORAR O UNIVERSO -->
+    <section id="explorar" class="section">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-title-wrap">
+            <span class="section-icon">🔭</span>
+            <h2 class="section-title">Explorar o Universo</h2>
+          </div>
+          <p class="section-desc">Navegue pelos corpos celestes catalogados, filtre por categoria ou pesquise pelo nome.</p>
+        </div>
+
+        <!-- Barra de Controles e Filtros -->
+        <div class="controls-bar">
+          <div class="search-wrap">
+            <span class="search-icon">🔍</span>
+            <input 
+              type="text" 
+              id="search-input" 
+              class="search-input" 
+              placeholder="Pesquisar astro pelo nome (ex: Júpiter, Andrômeda, Betelgeuse...)" 
+              autocomplete="off"
+            >
+            <button id="search-clear" class="search-clear" title="Limpar pesquisa">&times;</button>
+          </div>
+
+          <!-- Chips de Categorias -->
+          <div class="category-chips" id="category-chips">
+            <button class="chip-btn active" data-category="all">Todos</button>
+            <button class="chip-btn" data-category="Planetas">🪐 Planetas</button>
+            <button class="chip-btn" data-category="Luas">🌑 Luas</button>
+            <button class="chip-btn" data-category="Estrelas">☀️ Estrelas</button>
+            <button class="chip-btn" data-category="Galáxias">🌀 Galáxias</button>
+            <button class="chip-btn" data-category="Nebulosas">✨ Nebulosas</button>
+            <button class="chip-btn" data-category="Buracos Negros">🕳️ Buracos Negros</button>
+            <button class="chip-btn" data-category="Outros">☄️ Outros</button>
+          </div>
+        </div>
+
+        <!-- Grade de Cards dos Astros -->
+        <div class="astros-grid" id="astros-grid">
+          <!-- Cards injetados dinamicamente via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO: CADASTRAR ASTRO -->
+    <section id="cadastrar" class="section">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-title-wrap">
+            <span class="section-icon">🚀</span>
+            <h2 class="section-title">Cadastrar Astro</h2>
+          </div>
+          <p class="section-desc">Adicione uma nova descoberta cósmica à enciclopédia com detalhes e curiosidades.</p>
+        </div>
+
+        <div class="form-card-container">
+          <!-- Formulário -->
+          <form id="astro-form" novalidate>
+            <div class="form-grid">
+              <!-- Nome -->
+              <div class="form-group">
+                <label class="form-label" for="astro-nome">
+                  Nome do Astro <span class="req">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  id="astro-nome" 
+                  name="nome" 
+                  class="form-control" 
+                  placeholder="Ex: Marte, Nebulosa de Hélix..." 
+                  required
+                >
+              </div>
+
+              <!-- Categoria -->
+              <div class="form-group">
+                <label class="form-label" for="astro-categoria">
+                  Categoria <span class="req">*</span>
+                </label>
+                <select id="astro-categoria" name="categoria" class="form-control" required>
+                  <option value="" disabled selected>Selecione a categoria</option>
+                  <option value="Planetas">Planetas</option>
+                  <option value="Luas">Luas</option>
+                  <option value="Estrelas">Estrelas</option>
+                  <option value="Galáxias">Galáxias</option>
+                  <option value="Nebulosas">Nebulosas</option>
+                  <option value="Buracos Negros">Buracos Negros</option>
+                  <option value="Outros">Outros</option>
+                </select>
+              </div>
+
+              <!-- URL da Imagem -->
+              <div class="form-group full-width">
+                <label class="form-label" for="astro-imagem">
+                  URL da Imagem <span class="req">*</span>
+                </label>
+                <input 
+                  type="url" 
+                  id="astro-imagem" 
+                  name="imagem" 
+                  class="form-control" 
+                  placeholder="https://exemplo.com/foto-do-astro.jpg" 
+                  required
+                >
+                <div class="quick-images-wrap">
+                  <span>Sugestões rápidas de fotos:</span>
+                  <button type="button" class="quick-img-btn" data-url="https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?auto=format&fit=crop&w=1000&q=80">Marte</button>
+                  <button type="button" class="quick-img-btn" data-url="https://images.unsplash.com/photo-1614314107768-6018061b5b72?auto=format&fit=crop&w=1000&q=80">Saturno</button>
+                  <button type="button" class="quick-img-btn" data-url="https://images.unsplash.com/photo-1451187580459-43490279c0fa?auto=format&fit=crop&w=1000&q=80">Supernova</button>
+                  <button type="button" class="quick-img-btn" data-url="https://images.unsplash.com/photo-1543722530-d2c3201371e7?auto=format&fit=crop&w=1000&q=80">Galáxia</button>
+                  <button type="button" class="quick-img-btn" data-url="https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=1000&q=80">Nebulosa</button>
+                </div>
+              </div>
+
+              <!-- Distância -->
+              <div class="form-group">
+                <label class="form-label" for="astro-distancia">
+                  Distância <span class="req">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  id="astro-distancia" 
+                  name="distancia" 
+                  class="form-control" 
+                  placeholder="Ex: 225 milhões de km / 1.500 anos-luz" 
+                  required
+                >
+              </div>
+
+              <!-- Localização / Sistema -->
+              <div class="form-group">
+                <label class="form-label" for="astro-localizacao">
+                  Localização / Sistema <span class="req">*</span>
+                </label>
+                <input 
+                  type="text" 
+                  id="astro-localizacao" 
+                  name="localizacao" 
+                  class="form-control" 
+                  placeholder="Ex: Sistema Solar, Braço de Sagitário..." 
+                  required
+                >
+              </div>
+
+              <!-- Descrição -->
+              <div class="form-group full-width">
+                <label class="form-label" for="astro-descricao">
+                  Descrição Completa <span class="req">*</span>
+                </label>
+                <textarea 
+                  id="astro-descricao" 
+                  name="descricao" 
+                  class="form-control" 
+                  placeholder="Descreva as principais características físicas, composição e história deste astro..." 
+                  rows="3" 
+                  required
+                ></textarea>
+              </div>
+
+              <!-- Curiosidade -->
+              <div class="form-group full-width">
+                <label class="form-label" for="astro-curiosidade">
+                  Curiosidade Fascinante <span class="req">*</span>
+                </label>
+                <textarea 
+                  id="astro-curiosidade" 
+                  name="curiosidade" 
+                  class="form-control" 
+                  placeholder="Um fato impressionante ou dado curioso sobre este objeto do universo..." 
+                  rows="2" 
+                  required
+                ></textarea>
+              </div>
+
+              <!-- Botão Cadastrar -->
+              <div class="form-group full-width" style="margin-top: 1rem;">
+                <button type="submit" class="btn btn-primary" style="width: 100%; padding: 0.9rem;">
+                  <span>✨</span> Cadastrar Astro
+                </button>
+              </div>
+            </div>
+          </form>
+
+          <!-- Painel de Pré-Visualização Dinâmica do Card -->
+          <div class="preview-container">
+            <div class="preview-title">
+              <span>👁️</span> Pré-visualização do Card
+            </div>
+            <div class="preview-card-wrap">
+              <div class="astro-card" id="card-preview">
+                <div class="card-media">
+                  <span class="category-badge cat-planetas" id="preview-badge">Categoria</span>
+                  <img id="preview-img" src="https://images.unsplash.com/photo-1614728894747-a83421e2b9c9?auto=format&fit=crop&w=1000&q=80" alt="Prévia">
+                </div>
+                <div class="card-body">
+                  <h3 class="card-title" id="preview-title">Nome do Astro</h3>
+                  <p class="card-desc" id="preview-desc">A descrição do seu astro será exibida aqui em tempo real enquanto você digita no formulário.</p>
+                  <div class="card-meta">
+                    <div class="meta-item">
+                      <span>📍</span> Local: <strong id="preview-loc">Sistema Solar</strong>
+                    </div>
+                    <div class="meta-item">
+                      <span>📏</span> Distância: <strong id="preview-dist">0 km</strong>
+                    </div>
+                  </div>
+                  <div class="card-footer">
+                    <button class="btn btn-secondary btn-sm" type="button" disabled>Ver Detalhes</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- SEÇÃO: MEUS FAVORITOS -->
+    <section id="favoritos" class="section">
+      <div class="container">
+        <div class="section-header">
+          <div class="section-title-wrap">
+            <span class="section-icon">⭐</span>
+            <h2 class="section-title">Meus Favoritos</h2>
+          </div>
+          <p class="section-desc">Sua seleção pessoal dos objetos mais fascinantes do cosmos.</p>
+        </div>
+
+        <div class="astros-grid" id="favoritos-grid">
+          <!-- Cards favoritos injetados dinamicamente via JS -->
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- ==========================================================================
+       MODAIS
+       ========================================================================== -->
+
+  <!-- 1. Modal de Detalhes do Astro -->
+  <div class="modal-overlay" id="modal-details" role="dialog" aria-modal="true">
+    <div class="modal-card">
+      <button class="modal-close-btn" id="modal-details-close" title="Fechar">&times;</button>
+      <div class="modal-hero-img">
+        <img id="modal-img" src="" alt="Astro">
+      </div>
+      <div class="modal-content">
+        <div class="modal-badge-row">
+          <span class="category-badge" id="modal-badge">Categoria</span>
+          <button class="btn-fav" id="modal-fav-btn" title="Favoritar">⭐</button>
+        </div>
+        <h3 class="modal-title" id="modal-nome">Nome do Astro</h3>
+
+        <div class="modal-specs-grid">
+          <div class="spec-box">
+            <span class="spec-label">Distância</span>
+            <span class="spec-value" id="modal-distancia">-</span>
+          </div>
+          <div class="spec-box">
+            <span class="spec-label">Localização / Sistema</span>
+            <span class="spec-value" id="modal-localizacao">-</span>
+          </div>
+        </div>
+
+        <div class="modal-desc-box">
+          <h4>Descrição</h4>
+          <p id="modal-descricao" class="text-secondary">-</p>
+        </div>
+
+        <div class="modal-curiosity-box">
+          <h4>💡 Curiosidade Fascinante</h4>
+          <p id="modal-curiosidade">-</p>
+        </div>
+
+        <div class="modal-actions">
+          <button class="btn btn-danger btn-sm" id="modal-btn-delete">
+            <span>🗑️</span> Excluir
+          </button>
+          <div class="modal-actions-right">
+            <button class="btn btn-secondary btn-sm" id="modal-btn-edit">
+              <span>✏️</span> Editar
+            </button>
+            <button class="btn btn-primary btn-sm" id="modal-btn-ok">
+              Concluído
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Modal de Edição de Astro -->
+  <div class="modal-overlay" id="modal-edit" role="dialog" aria-modal="true">
+    <div class="modal-card" style="max-width: 600px;">
+      <button class="modal-close-btn" id="modal-edit-close" title="Fechar">&times;</button>
+      <div class="modal-content" style="padding-top: 2rem;">
+        <h3 class="modal-title" style="font-size: 1.5rem; margin-bottom: 1.5rem;">
+          <span>✏️</span> Editar Astro
+        </h3>
+        
+        <form id="edit-form" novalidate>
+          <input type="hidden" id="edit-id">
+          
+          <div class="form-grid" style="grid-template-columns: 1fr;">
+            <div class="form-group">
+              <label class="form-label" for="edit-nome">Nome do Astro</label>
+              <input type="text" id="edit-nome" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="edit-categoria">Categoria</label>
+              <select id="edit-categoria" class="form-control" required>
+                <option value="Planetas">Planetas</option>
+                <option value="Luas">Luas</option>
+                <option value="Estrelas">Estrelas</option>
+                <option value="Galáxias">Galáxias</option>
+                <option value="Nebulosas">Nebulosas</option>
+                <option value="Buracos Negros">Buracos Negros</option>
+                <option value="Outros">Outros</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="edit-imagem">URL da Imagem</label>
+              <input type="url" id="edit-imagem" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="edit-distancia">Distância</label>
+              <input type="text" id="edit-distancia" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="edit-localizacao">Localização / Sistema</label>
+              <input type="text" id="edit-localizacao" class="form-control" required>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="edit-descricao">Descrição</label>
+              <textarea id="edit-descricao" class="form-control" rows="3" required></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="edit-curiosidade">Curiosidade</label>
+              <textarea id="edit-curiosidade" class="form-control" rows="2" required></textarea>
+            </div>
+          </div>
+
+          <div class="modal-actions" style="margin-top: 1.5rem;">
+            <button type="button" class="btn btn-secondary" id="modal-edit-cancel">Cancelar</button>
+            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 3. Modal de Confirmação de Exclusão -->
+  <div class="modal-overlay" id="modal-confirm" role="dialog" aria-modal="true">
+    <div class="modal-card modal-confirm-card">
+      <div class="confirm-icon">⚠️</div>
+      <h3 class="modal-title" style="font-size: 1.35rem; margin-bottom: 0.75rem;">Confirmar Exclusão</h3>
+      <p class="text-secondary" id="confirm-message">
+        Tem certeza que deseja remover este astro da enciclopédia? Esta ação não pode ser desfeita.
+      </p>
+      <div class="confirm-actions">
+        <button class="btn btn-secondary" id="confirm-btn-cancel">Cancelar</button>
+        <button class="btn btn-danger" id="confirm-btn-delete">Excluir Definitivamente</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Container de Toasts de Notificação -->
+  <div class="toast-container" id="toast-container" aria-live="polite"></div>
+
+  <!-- Rodapé -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="logo footer-brand" style="justify-content: center; margin-bottom: 0.75rem;">
+        <div class="logo-icon">🪐</div>
+        <span>SpaceDex</span>
+      </div>
+      <p class="footer-text">Enciclopédia digital do universo. Desenvolvido para catalogar e desvendar os mistérios do cosmos.</p>
+      <p class="footer-meta">&copy; 2026 SpaceDex • Pronto para integração com Firebase Firestore</p>
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
