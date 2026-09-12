@@ -8,11 +8,14 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 
-# Configurações de ambiente e IDE
+# Configurações de ambiente, IDE e chaves
 .vscode/
 .idea/
 *.env
 *.env.local
+*Git.txt
+*.key
+*.pem
 
 # Firebase (para futura integração)
 .firebase/
